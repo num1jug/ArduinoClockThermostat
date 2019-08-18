@@ -2,17 +2,20 @@
 #include <LiquidCrystal.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#include <RTClib.h>
-
-#define ONE_WIRE_BUS 7
+#include "RTClib.h"
 
 RTC_DS1307 rtc;
-LiquidCrystal lcd(12,11,5,4,3,2);
+
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+
+#define ONE_WIRE_BUS 7
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
-char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 float tempF = 0;
+
+LiquidCrystal lcd(12,11,5,4,3,2);
 
 void setup()
 {
@@ -22,44 +25,62 @@ void setup()
   pinMode(3, OUTPUT);
   pinMode(7, INPUT);
   analogWrite(3, 0);
-  rtc.begin(); 
-  Serial.begin(57600);
-  
+  rtc.begin();  
 }
 
 void loop()
 {
-  sensors.requestTemperatures();
-  tempF = sensors.getTempFByIndex(0);
+  sensors.requestTemperatures();                       //get the temperature from the sensor
+  tempF = sensors.getTempFByIndex(0);                  //sets the temperature to the variable tempF
   //tempF = sensors.toFahrenheit(tempC);
   
-  lcd.setCursor(0,1);
-  lcd.print(tempF); lcd.print((char)223);
-DateTime now = rtc.now();
+  lcd.setCursor(0,1);                                  // sets the position of the cursor for temperature
+  lcd.print(tempF); lcd.print((char)223);              //display the temperature in Fahrenheit with degree symbol
+  
+  DateTime now = rtc.now();
 
-  lcd.setCursor(12,0);
-  lcd.print(now.month(), DEC);
-  lcd.print('/');
-  lcd.print(now.day(), DEC);
-  lcd.setCursor(0,0);
-  lcd.print(daysOfTheWeek[now.dayOfTheWeek()]);
-  lcd.setCursor(10,1);
-   if ( now.hour() >=13 ) {
-    //lcd.print("0");
-    lcd.print(now.hour() - 12, DEC);
-    lcd.print(':');
-    lcd.print(now.minute(), DEC);
-    lcd.print("pm");
-    }
-   else {
-    lcd.print(now.hour(), DEC);
-    lcd.print(':');
-    lcd.print(now.minute(), DEC);
-    lcd.print("am");
-    }
+    lcd.setCursor(12,0);                               //sets the position of the cursor for date MM/DD
+    lcd.print(now.month(), DEC);                       //display month
+    lcd.print('/'); 
+    lcd.print(now.day(), DEC);                         //display day
+    
+    lcd.setCursor(0,0);                                //sets the position of the cursor for the DayoftheWeek display
+    lcd.print(daysOfTheWeek[now.dayOfTheWeek()]);      //display day of the week
+    
+    lcd.setCursor(10,1);                               //sets the position of the clock
+    
+    /*The if-loop below creates a 12-hour clock (for 24-hour clock, see the line above the loop)
+     *It first checks to see if the hour is >= 13,
+     *if so, it sebtracts 12 and prints that as the hour. 
+     *It will also add the appropriate "am" or "pm"
+     *There is another if-loop within to ensure the first 9 minutes always display as double-digits.
+      */
+
+    //lcd.print(now.hour(), DEC);                      //24-hour clock one-liner
+    if ( now.hour() >=13 ) {                           //12-hour clock loop 
+      //lcd.print("0");                                //this option is can be un-commented out to add a leading "0" to single digit hours, e.g., 01:01am
+      lcd.print(now.hour() - 12, DEC);
+      lcd.print(':');                                                       
+        if (now.minute() <= 9  ) {                       //this ensures the first 9 minutes are displayed :01, :02, :03, ....
+          lcd.print("0");
+        }
+      lcd.print(now.minute(), DEC);
+        if ( now.hour() >=12 ) {
+          lcd.print("pm");                                 //sets the pm for anytime after within and after the 12th hour
+        }
+      }
+    else {
+      lcd.print(now.hour(), DEC);
+      lcd.print(':');
+        if ( now.minute() <= 9  ) {                       //this ensures the first 9 minutes are displayed :01, :02, :03, ....
+          lcd.print("0");
+      lcd.print(now.minute(), DEC);
+        if ( now.hour() >=12 )
+          lcd.print("am");
+     }
     
 
     delay(3000);  
 
- 
+    } 
 }
