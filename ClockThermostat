@@ -2,20 +2,17 @@
 #include <LiquidCrystal.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#include "RTClib.h"
-
-RTC_DS1307 rtc;
-
-char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-
+#include <RTClib.h>
 
 #define ONE_WIRE_BUS 7
+
+RTC_DS1307 rtc;
+LiquidCrystal lcd(12,11,5,4,3,2);
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 float tempF = 0;
-
-LiquidCrystal lcd(12,11,5,4,3,2);
 
 void setup()
 {
@@ -40,25 +37,25 @@ void loop()
   lcd.print(tempF); lcd.print((char)223);
 DateTime now = rtc.now();
 
-    lcd.setCursor(12,0);
-    lcd.print(now.month(), DEC);
-    lcd.print('/');
-    lcd.print(now.day(), DEC);
-    lcd.setCursor(0,0);
-    lcd.print(daysOfTheWeek[now.dayOfTheWeek()]);
-    lcd.setCursor(10,1);
-    if ( now.hour() >=13 ) {
-      //lcd.print("0");
-      lcd.print(now.hour() - 12, DEC);
-      lcd.print(':');
-      lcd.print(now.minute(), DEC);
-      lcd.print("pm");
-      }
-    else {
-      lcd.print(now.hour(), DEC);
-      lcd.print(':');
-      lcd.print(now.minute(), DEC);
-      lcd.print("am");
+  lcd.setCursor(12,0);
+  lcd.print(now.month(), DEC);
+  lcd.print('/');
+  lcd.print(now.day(), DEC);
+  lcd.setCursor(0,0);
+  lcd.print(daysOfTheWeek[now.dayOfTheWeek()]);
+  lcd.setCursor(10,1);
+   if ( now.hour() >=13 ) {
+    //lcd.print("0");
+    lcd.print(now.hour() - 12, DEC);
+    lcd.print(':');
+    lcd.print(now.minute(), DEC);
+    lcd.print("pm");
+    }
+   else {
+    lcd.print(now.hour(), DEC);
+    lcd.print(':');
+    lcd.print(now.minute(), DEC);
+    lcd.print("am");
     }
     
 
