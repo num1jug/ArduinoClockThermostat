@@ -61,26 +61,26 @@ void loop()
       //lcd.print("0");                                //this option is can be un-commented out to add a leading "0" to single digit hours, e.g., 01:01am
       lcd.print(now.hour() - 12, DEC);
       lcd.print(':');                                                       
-        if (now.minute() <= 9  ) {                       //this ensures the first 9 minutes are displayed :01, :02, :03, ....
+        if (now.minute() <= 9  ) {                     //this ensures the first 9 minutes are displayed :01, :02, :03, ....
           lcd.print("0");
         }
       lcd.print(now.minute(), DEC);
         if ( now.hour() >=12 ) {
-          lcd.print("pm");                                 //sets the pm for anytime after within and after the 12th hour
+          lcd.print("pm");                             //sets the pm for anytime after within and after the 12th hour
         }
       }
     else {
       lcd.print(now.hour(), DEC);
       lcd.print(':');
-        if ( now.minute() <= 9  ) {                       //this ensures the first 9 minutes are displayed :01, :02, :03, ....
+        if ( now.minute() <= 9  ) {                    //this ensures the first 9 minutes are displayed :01, :02, :03, ....
           lcd.print("0");
       lcd.print(now.minute(), DEC);
-        if ( now.hour() >=12 )
-          lcd.print("am");
+        if ( now.hour() >=11 )
+          lcd.print("am");                             //sets the am for anytime within and before the 11th hour
      }
     
 
-    delay(3000);  
+    delay(3000);                                       //waits 3 seconds before restarting the program
 
     } 
 }
