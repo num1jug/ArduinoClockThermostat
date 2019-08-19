@@ -75,7 +75,7 @@ void loop()
         if ( now.minute() <= 9  ) {                    //this ensures the first 9 minutes are displayed :01, :02, :03, ....
           lcd.print("0");
       lcd.print(now.minute(), DEC);
-        if ( now.hour() >=11 )
+        if ( now.hour() <=11 )
           lcd.print("am");                             //sets the am for anytime within and before the 11th hour
      }
     
