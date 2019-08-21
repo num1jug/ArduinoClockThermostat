@@ -15,72 +15,74 @@ DallasTemperature sensors(&oneWire);
 
 float tempF = 0;
 
-LiquidCrystal lcd(12,11,5,4,3,2);
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);              //pin usage settings for the LCD screen
 
 void setup()
 {
   sensors.begin();
-  lcd.begin(16,2);
+  lcd.begin(16, 2);
   lcd.clear();
   pinMode(3, OUTPUT);
   pinMode(7, INPUT);
   analogWrite(3, 0);
-  rtc.begin();  
+  rtc.begin();
+  //rtc.adjust(DateTime(2019, 8, 20, 19, 7, 0));
 }
 
 void loop()
 {
-  sensors.requestTemperatures();                       //get the temperature from the sensor
-  tempF = sensors.getTempFByIndex(0);                  //sets the temperature to the variable tempF
+  sensors.requestTemperatures();                     //get the temperature from the sensor
+  tempF = sensors.getTempFByIndex(0);                //sets the temperature to the variable tempF
   //tempF = sensors.toFahrenheit(tempC);
-  
-  lcd.setCursor(0,1);                                  // sets the position of the cursor for temperature
-  lcd.print(tempF); lcd.print((char)223);              //display the temperature in Fahrenheit with degree symbol
-  
+
+  lcd.setCursor(0, 1);                               //sets the position of the cursor for temperature
+  lcd.print(tempF); lcd.print((char)223);            //display the temperature in Fahrenheit with degree symbol
+
   DateTime now = rtc.now();
 
-    lcd.setCursor(12,0);                               //sets the position of the cursor for date MM/DD
-    lcd.print(now.month(), DEC);                       //display month
-    lcd.print('/'); 
-    lcd.print(now.day(), DEC);                         //display day
-    
-    lcd.setCursor(0,0);                                //sets the position of the cursor for the DayoftheWeek display
-    lcd.print(daysOfTheWeek[now.dayOfTheWeek()]);      //display day of the week
-    
-    lcd.setCursor(10,1);                               //sets the position of the clock
-    
-    /*The if-loop below creates a 12-hour clock (for 24-hour clock, see the line above the loop)
-     *It first checks to see if the hour is >= 13,
-     *if so, it sebtracts 12 and prints that as the hour. 
-     *It will also add the appropriate "am" or "pm"
-     *There is another if-loop within to ensure the first 9 minutes always display as double-digits.
-      */
+  lcd.setCursor(12, 0);                              //sets the position of the cursor for date MM/DD
+  lcd.print(now.month(), DEC);                       //display month
+  lcd.print('/');
+  lcd.print(now.day(), DEC);                         //display day
 
-    //lcd.print(now.hour(), DEC);                      //24-hour clock one-liner
-    if ( now.hour() >=13 ) {                           //12-hour clock loop 
-      //lcd.print("0");                                //this option is can be un-commented out to add a leading "0" to single digit hours, e.g., 01:01am
-      lcd.print(now.hour() - 12, DEC);
-      lcd.print(':');                                                       
-        if (now.minute() <= 9  ) {                     //this ensures the first 9 minutes are displayed :01, :02, :03, ....
-          lcd.print("0");
-        }
-      lcd.print(now.minute(), DEC);
-        if ( now.hour() >=12 ) {
-          lcd.print("pm");                             //sets the pm for anytime within and after the 12th hour
-        }
-      }
-    else {
-      lcd.print(now.hour(), DEC);
-      lcd.print(':');
-        if ( now.minute() <= 9  ) {                    //this ensures the first 9 minutes are displayed :01, :02, :03, ....
-          lcd.print("0");
-      lcd.print(now.minute(), DEC);
-        if ( now.hour() <=11 )
-          lcd.print("am");                             //sets the am for anytime within and before the 11th hour
-     }
-    
+  lcd.setCursor(0, 0);                               //sets the position of the cursor for the DayoftheWeek display
+  lcd.print(daysOfTheWeek[now.dayOfTheWeek()]);      //display day of the week
 
-    delay(3000);                                       //waits 3 seconds before restarting the program
+  if ( now.hour() >= 10 ) {                          //an if-statement to set the appropriate starting position determined by whether the hours are one or two digits
+    lcd.setCursor(9, 1);
+  }
+  else {
+    lcd.setCursor(10, 1);                              
+  }
 
-    } 
+  /*The if-statements below create a 12-hour clock (for 24-hour clock, see the line above the loop)
+    Statement 1 checks to see if the hour is >= 13,
+    if yes, then it sebtracts 12 and prints that as the hour, 
+    otherwise (else) the two-digit hour is printed.
+    Statement 2 will add the appropriate "am" or "pm"
+    Statement 3 ensures the first 9 minutes always display as double-digits.
+  */
+
+  //lcd.print(now.hour(), DEC);                      //24-hour clock one-liner
+  
+  if ( now.hour() >= 13 ) {                          //Statement 1
+    lcd.print(now.hour() - 12, DEC);
+  }
+  else {
+    lcd.print(now.hour(), DEC);
+  }
+  lcd.print(':');
+  if (now.minute() <= 9  ) {                         //Statement 2
+    lcd.print("0");
+  }
+  lcd.print(now.minute(), DEC);
+  if ( now.hour() >= 12 ) {                          //Statement 3
+    lcd.print("pm");
+  }
+  else {
+    lcd.print("am");
+  }
+
+delay(3000);                                         //wait three seconds to restart the loop
+
 }
